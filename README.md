@@ -20,8 +20,8 @@ Official release repository for the **ESK Reborn Kernel**.
 
 | Suffix | Root / Features |
 |---|---|
-| `KSU-SUSFS` | KernelSU + SUSFS |
-| `KSU-SUSFS-LXC` | KernelSU + SUSFS + LXC containers |
+| `KSU-SUSFS` | **ReSukiSU** (KernelSU) + SUSFS **v2.2.0** |
+| `KSU-SUSFS-LXC` | **ReSukiSU** (KernelSU) + SUSFS **v2.2.0** + LXC containers |
 | `VNL` | Vanilla (no root) |
 
-Flash the `AnyKernel3.zip` matching your variant. See the [Releases](https://github.com/AKALIorg/ESK-Kernel-Reborn-Releases/releases) tab for downloads.
+All KernelSU-based builds use **ReSukiSU** with **SUSFS 2.2.0**. Flash the `AnyKernel3.zip` matching your variant. See the [Releases](https://github.com/AKALIorg/ESK-Kernel-Reborn-Releases/releases) tab for downloads.
