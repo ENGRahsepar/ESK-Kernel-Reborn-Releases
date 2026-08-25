@@ -4,7 +4,8 @@ Official release repository for the **ESK Reborn Kernel**.
 
 - **SoC:** MediaTek Dimensity 8100 (`MT6895`)
 - **Kernel:** Linux **5.10 LTS** (stable sublevel tracked)
-- **Base:** Android Common Kernel **android12-5.10** + MediaTek/Xiaomi vendor code
+- **Base:** Google **android12-5.10** common kernel (the devices' stock base) + MediaTek/Xiaomi vendor code
+- **ROM support:** Android **16 / 17** custom ROMs *(not tested)*
 - **Source:** [AKALIorg/android_kernel_xiaomi_mt6895](https://github.com/AKALIorg/android_kernel_xiaomi_mt6895)
 
 ## Supported Devices (xaga family)
