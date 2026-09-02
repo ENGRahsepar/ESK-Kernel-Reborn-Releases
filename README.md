@@ -17,6 +17,10 @@ Official release repository for the **ESK Reborn Kernel**.
 | Redmi Note 11T Pro+ | `xagapro` | 22041216UC | China variant (120W charging) |
 | Redmi K50i | `xagain` | 22041216I | India variant |
 
+## Versioning
+
+`uname -r` carries the release tag, e.g. `5.10.269-android12-...-ESK-Reborn_V0.3`. The suffix in `CONFIG_LOCALVERSION` (xaga.config) is bumped for every release (`V0.1`, `V0.2`, ...).
+
 ## Variants
 
 | Suffix | Root / Features |
