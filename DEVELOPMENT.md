@@ -445,3 +445,124 @@ Commit message format (Android Common Kernel rules):
 - **KABI reserves** = `ANDROID_KABI_RESERVE(n)` padding in task_struct; BORE uses 1-4, lxc_support.patch uses 6-8. New task_struct fields MUST use a free reserve or be appended past them.
 - Commit style: `ANDROID:` / `BACKPORT:` prefixes, Change-Id + Signed-off-by (see §4).
 - Push + verify (`git log origin/branch -1`). Upload + verify zip Image version. Update DEVELOPMENT.md every change (§9).
+
+---
+
+## 13. COMPLETE CPU POLICY / SYSFS MAP (MT6895)
+
+```
+policy0  = CPU0-3 (Little, A55, cap 380, perf-domain 0)
+policy4  = CPU4-6 (Big, A78, cap 1024, perf-domain 1)
+policy7  = CPU7   (Prime, A78, cap 1024, perf-domain 2 — SEPARATE DVFS domain)
+```
+
+ESK sysfs (only exists after `echo esk > .../scaling_governor`):
+```
+/sys/devices/system/cpu/cpufreq/policy0/esk/  → rate_limit_us, up_rate_limit_us, down_rate_limit_us
+/sys/devices/system/cpu/cpufreq/policy4/esk/  → same (big tier)
+/sys/devices/system/cpu/cpufreq/policy7/esk/  → same + gaming_mode, prime_gaming_floor_pct,
+                                                temp_mc, thermal_zone (prime tier hosts gaming)
+```
+
+Key runtime sysctls:
+```
+kernel.sched_bore                       = 1     (BORE on)
+kernel.sched_burst_fork_atavistic       = 0     (fork inherits fresh)
+kernel.sched_burst_smoothness_long/short, sched_burst_penalty_offset/scale
+vm.anon_min_ratio / vm.clean_low_ratio / vm.clean_min_ratio = 0/0/0 (le9uo OFF)
+net.ipv4.tcp_congestion_control         = bbr   (bbrplus selectable)
+kernel.hung_task_timeout_secs           = 10 during debugging (default 120)
+/sys/kernel/mm/ksm/run                  = 0 (KSM opt-in)
+```
+
+---
+
+## 14. PROBLEM→FIX HISTORY MATRIX (symptom → mechanism → commit)
+
+| Symptom | Root cause | Fix commit | Status |
+|---|---|---|---|
+| Build warning stack frame 4144 | Dead 4KB str_bufs in imgsensor frame_sync_console | `f8e3dbe2` | fixed |
+| huge_memory build error (flags) | 5.10.267 merge + vendor irq-path divergence | `03e2cd2b` | fixed |
+| AP_WDT boot-unlock crash | ESK inline-path: clamp+skip paths returned holding update_lock IRQs-off | `b1d029ca` (+gates `47b9606d`) | fixed |
+| Warm app-switch AP_WDT | Same mechanism (thermal limit churn re-entry) | `b1d029ca` | fixed |
+| Game freezes ~20s, display off, SystemUI crash, app kills, soft reboot (both governors, charging makes worse, heavy Roblox only) | **TWO independent bugs:** (a) le9uo `clean_min_ratio=25%` floor → reclaim zero-progress livelock; (b) binder `mmap_write_lock` uninterruptible while cgroup-frozen app holds mmap_sem read in page fault | `25176a53` + `527111b4` | fixed |
+| UI lags (ESK v1 era) | CFS skip-buddy no-op under EEVDF + stale BORE reweight deadlines + PELT32 latency | `90bac8e9` + `87c22842` | fixed |
+| CPU7 300↔2850MHz oscillation (PUBG capture) | No prime/big tier split; sustained boosts pinned CPU7 | `25462d21` | fixed, needs on-device validation |
+| ZRAM writeback wear (UFS health) | Writeback writes cold pages to flash | `5a64ca47` (removed) | fixed |
+| le9uo originally shipped active | Ratios too aggressive for 8GB gaming | `25176a53` (0/0/0) | fixed |
+
+**Last known 100% crash-free baseline: 0.2 (dd3b1030, 5.10.266).** 0.3 Beta 2 (25176a53)
+fixes all known regressions but has less cumulative on-device hours than 0.2.
+
+---
+
+## 15. PROVEN PROCEDURES (how we do things here)
+
+### 15.1 Porting a feature from Templar (or any donor kernel)
+1. Find the donor commit(s): `https://api.github.com/repos/<owner>/<repo>/commits?sha=<branch>&path=<file>`
+2. Download `.patch`: `curl -sL https://github.com/<owner>/<repo>/commit/<sha>.patch -o x.patch`
+3. `git apply --check` → if fails, `git apply -3` → if fails, hand-port against the donor's
+   FINAL file version (`raw.githubusercontent.com/<owner>/<repo>/<branch>/<path>`)
+4. Rename symbols if needed (vorpal→esk, rfx_→esk_) preserving upstream author credit
+5. Adapt API deltas (5.10 vs donor base — e.g. tso_segs(sk,mss) vs min_tso_segs(sk))
+6. Compile-test the .o with builder clang (§1.2)
+7. Commit BACKPORT:/ANDROID: format + Link: tags + Change-Id + Signed-off-by
+8. Push, **verify push**, update DEVELOPMENT.md
+
+### 15.2 Stable-sublevel rebase procedure
+1. `git fetch --no-tags stable tag v5.10.26X`
+2. `git merge --no-commit v5.10.26X`
+3. Conflict policy: vendor-diverged files keep HEAD; check each conflict against §2 map
+4. **Verify BORE/EEVDF KABI block in include/linux/sched.h survives** (reserves 1-4)
+5. Verify Makefile SUBLEVEL, commit `Update to Linux 5.10.26X`, push+verify
+6. User rebuilds + tests before release
+
+### 15.3 Uploading a release asset (exact steps)
+1. `ls /home/akali/ESK_Reborn/*/` — locate user's zips
+2. **VERIFY ZIP**: `unzip -p <zip> Image.zst | zstd -d | strings | grep "Linux version"`
+   → must match intended commit sha
+3. `gh release upload <tag> --clobber <zip> <module.tar.xz>`
+4. `gh release view <tag> --json assets` — verify size+state=uploaded
+5. Update notes: real filename in Builds table, banner update
+6. `gh release edit <tag> --prerelease` (or remove) per user intent
+
+### 15.4 Token/cost efficiency with the user
+- User pays per token; avoid re-reading huge files; use grep/sed targeted extraction
+- Logs: always grep for signatures (§1.3) before reading raw
+- Don't re-clone repos that exist in /tmp — check first; /tmp is wiped on reboot
+- Batch related shell work in single calls
+
+---
+
+## 16. CURRENT PROJECT STATUS & ROADMAP (as of this document)
+
+**State: 0.3 Beta 2 (prerelease) — first build with zero known crash mechanisms.**
+Reported stable in early testing (5h gaming + boot-unlock + charging sessions).
+
+### Roadmap (priority order)
+1. **Vorpal/ESK v2.2 port** (§3.1) — fps stability + battery (biggest pending item)
+2. On-device validation of prime-selective boost + EEVDF yield (PUBG SF-capture targets:
+   max FT <200ms, Big Jank −50%, run-over-run variance down)
+3. ESK → default governor once user validates multi-day stability (flip
+   CONFIG_CPU_FREQ_DEFAULT_GOV_ESK=y + localversion bump)
+4. **MGLRU port** (Templar-MGLRU branch) — highest-impact remaining feature, large effort
+5. Stable-sublevel tracking (5.10.26X when new lands, §15.2)
+6. Optional: SurfaceFlinger RT scoping (needs ROM-side init.rc wiring, spec §1)
+7. Optional: DTS CPU7 distinct capacity (EAS-level prime awareness prerequisite)
+
+### Open questions / user-dependent
+- Does the user's ROM auto-enable KSM? (`cat /sys/kernel/mm/ksm/run` under load)
+- RT throttling recurrence under charging+gaming after binder fix? (if yes: consider
+  sched_rt_runtime_us=980000 runtime sysctl — NOT baked in, see §2.2)
+- Battery replacement candidate (1783 cycles) — hardware, not kernel
+
+---
+
+## 17. SESSION COST / EFFICIENCY NOTES
+
+- This project's chat sessions are expensive for the user — maximize per-session output:
+  plan with todo lists, batch tool calls, verify pushes/uploads inline, and END every
+  session by updating DEVELOPMENT.md (§9) so the next session starts with zero re-discovery.
+- Prefer downloading donor files raw over cloning donor repos (unless multi-file).
+- Keep local clones: kernel (always), releases repo (/tmp/opencode/esk-releases),
+  susfs (/tmp/opencode/susfs — re-clone when needed, /tmp wiped on reboot).
