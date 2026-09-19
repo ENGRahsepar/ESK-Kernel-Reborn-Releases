@@ -30,3 +30,13 @@ Official release repository for the **ESK Reborn Kernel**.
 | `VNL` | Vanilla (no root) |
 
 All KernelSU-based builds use **ReSukiSU** with **SUSFS 2.2.0**. Flash the `AnyKernel3.zip` matching your variant — see the [Installation Guide](INSTALL.md) (custom recovery + `adb sideload`). Downloads in the [Releases](https://github.com/AKALIorg/ESK-Kernel-Reborn-Releases/releases) tab.
+
+## Kernel features (0.3+)
+
+- **Bypass charging** (xaga) — VBUS powers the system, battery idles ~0mA. Root shell:
+> ```
+> su -c "echo 1 > /sys/class/power_supply/usb/bypass_charging"  # on
+> su -c "echo 0 > /sys/class/power_supply/usb/bypass_charging"  # off
+> ```
+> Needs charger plugged (67W-class recommended so VBUS covers gaming load); resets on reboot; compatible with the SimpleBypassChargerMTK module.
+- **ESK governor** (opt-in) — `echo esk > /sys/devices/system/cpu/cpufreq/policy{0,4,7}/scaling_governor`; `gaming_mode` + `prime_gaming_floor_pct` tunables on policy7.
