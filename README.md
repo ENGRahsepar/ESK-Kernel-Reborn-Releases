@@ -6,7 +6,7 @@ Official release repository for the **ESK Reborn Kernel**.
 - **Kernel:** Linux **5.10 LTS** (stable sublevel tracked)
 - **Base:** Google **android12-5.10** common kernel (the devices' stock base) + MediaTek/Xiaomi vendor code
 - **ROM support:** Android **16 / 17** custom ROMs *(not tested)*
-- **Source:** [AKALIorg/android_kernel_xiaomi_mt6895](https://github.com/AKALIorg/android_kernel_xiaomi_mt6895)
+- **Source:** [ENGRahsepar/android_kernel_xiaomi_mt6895](https://github.com/ENGRahsepar/android_kernel_xiaomi_mt6895)
 
 ## Supported Devices (xaga family)
 
@@ -29,7 +29,7 @@ Official release repository for the **ESK Reborn Kernel**.
 | `KSU-SUSFS-LXC` | **ReSukiSU** (KernelSU) + SUSFS **v2.2.0** + LXC containers |
 | `VNL` | Vanilla (no root) |
 
-All KernelSU-based builds use **ReSukiSU** with **SUSFS 2.2.0**. Flash the `AnyKernel3.zip` matching your variant — see the [Installation Guide](INSTALL.md) (custom recovery + `adb sideload`). Downloads in the [Releases](https://github.com/AKALIorg/ESK-Kernel-Reborn-Releases/releases) tab.
+All KernelSU-based builds use **ReSukiSU** with **SUSFS 2.2.0**. Flash the `AnyKernel3.zip` matching your variant — see the [Installation Guide](INSTALL.md) (custom recovery + `adb sideload`). Downloads in the [Releases](https://github.com/ENGRahsepar/ESK-Kernel-Reborn-Releases/releases) tab.
 
 ## Kernel features (0.3+)
 

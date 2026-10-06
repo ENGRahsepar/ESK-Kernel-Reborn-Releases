@@ -13,7 +13,7 @@ Applies to all supported devices: **POCO X4 GT (`xaga`)** · **Redmi Note 11T Pr
 - USB debugging enabled (**Settings → Developer options**)
 - Battery above **50%**
 - **AOSP recovery** (ships with your custom ROM) — there is no TWRP/OrangeFox for these devices
-- The correct `AnyKernel3.zip` from the [Releases](https://github.com/AKALIorg/ESK-Kernel-Reborn-Releases/releases) tab
+- The correct `AnyKernel3.zip` from the [Releases](https://github.com/ENGRahsepar/ESK-Kernel-Reborn-Releases/releases) tab
 
 ### Pick your build
 

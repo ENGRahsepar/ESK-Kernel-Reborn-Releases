@@ -4,10 +4,10 @@
 kernel source repository to any AI model or developer, and they can continue development
 without any prior session knowledge.
 
-- **Repo (kernel):** https://github.com/AKALIorg/android_kernel_xiaomi_mt6895
+- **Repo (kernel):** https://github.com/ENGRahsepar/android_kernel_xiaomi_mt6895
 - **Branch:** `16.2-rebase`
-- **Repo (releases):** https://github.com/AKALIorg/ESK-Kernel-Reborn-Releases
-- **Maintainer / owner:** AKALIorg (alirahsepar199@gmail.com), GitHub user `AKALIorg`
+- **Repo (releases):** https://github.com/ENGRahsepar/ESK-Kernel-Reborn-Releases
+- **Maintainer / owner:** ENGRahsepar (alirahsepar199@gmail.com), GitHub user `ENGRahsepar`
 - **Device:** Xiaomi POCO X4 GT (`xaga`), 8GB RAM — Dimensity **8100** (MT6895Z):
   4×Cortex-A78 @ 2.85GHz (CPU4-6 = Big cluster, CPU7 = **Prime, separate DVFS domain**)
   + 4×Cortex-A55 @ 2.0GHz (CPU0-3 = Little). DTS: `capacity-dmips-mhz` = 380 (little) /
@@ -250,7 +250,7 @@ Add "variants coming soon" note when partial variants upload. Verify EVERY uploa
 `unzip -p zip Image.zst | zstd -d | strings | grep "Linux version"` — a stale zip was
 almost shipped once; also verify the commit hash inside matches the intended build.
 
-User workflow: user builds variants locally, drops zips in `/home/akali/ESK_Reborn/<ver>_AKALIorg/`
+User workflow: user builds variants locally, drops zips in `/home/akali/ESK_Reborn/<ver>_ENGRahsepar/`
 folders, asks for upload. **ALWAYS verify zip's Image version string matches the intended
 commit BEFORE uploading.**
 
@@ -402,8 +402,8 @@ Commit message format (Android Common Kernel rules):
 ## 11. UPSTREAM LINKS (complete reference list)
 
 ### Kernel sources
-- Kernel source repo: https://github.com/AKALIorg/android_kernel_xiaomi_mt6895 (branch 16.2-rebase)
-- Releases repo: https://github.com/AKALIorg/ESK-Kernel-Reborn-Releases (branch main)
+- Kernel source repo: https://github.com/ENGRahsepar/android_kernel_xiaomi_mt6895 (branch 16.2-rebase)
+- Releases repo: https://github.com/ENGRahsepar/ESK-Kernel-Reborn-Releases (branch main)
 - kernel.org stable: https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git (tag v5.10.269 = current base; `git ls-remote ... "refs/tags/v5.10.*" | sort -V` to check newest)
 - AOSP common: https://android.googlesource.com/kernel/common (branch android12-5.10 / android12-5.10-lts)
 - Builder reference (closed, on user PC): `~/esk_builder/` (see §1.1)
