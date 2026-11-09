@@ -29,7 +29,7 @@ Official release repository for the **ESK Reborn Kernel**.
 | `KSU-SUSFS-LXC` | **BakaSU** (KernelSU) + SUSFS **v2.3.0** + LXC containers / Droidspaces |
 | `VNL` | Vanilla (no root) |
 
-All KernelSU-based builds use **BakaSU v4.2.0-rc3** (`sync-susfs` branch) with **SUSFS v2.3.0** pinned at the verified pairing commit. Flash the `AnyKernel3.zip` matching your variant — see the [Installation Guide](INSTALL.md) (Apply update → Apply from ADB; no TWRP on this device). Downloads in the [Releases](https://github.com/ENGRahsepar/ESK-Kernel-Reborn-Releases/releases) tab.
+All KernelSU-based builds use **BakaSU v4.2.0-rc3** (`sync-susfs` branch) with **SUSFS v2.3.0** pinned at the verified pairing commit. The companion root manager shipped with each release is **officially signed** — the kernel only accepts a manager whose signing certificate hash matches `EXPECTED_HASH_BAKASU`, so a self-built/debug-signed manager APK will be rejected by the kernel. Flash the `AnyKernel3.zip` matching your variant — see the [Installation Guide](INSTALL.md) (Apply update → Apply from ADB; no TWRP on this device). Downloads in the [Releases](https://github.com/ENGRahsepar/ESK-Kernel-Reborn-Releases/releases) tab.
 
 ## Kernel features (0.3+)
 
@@ -52,4 +52,4 @@ All KernelSU-based builds use **BakaSU v4.2.0-rc3** (`sync-susfs` branch) with *
 | 0.2 | `0.2` | 5.10.268 | 5.10.267/268 merges, huge_memory fix |
 | 0.3 | `0.3` | 5.10.270 | 5.10.269 merge, all crash fixes, ESK v2.2 opt-in, bypass charging |
 | 0.3.2 | `0.3.2` | 5.10.272 | BakaSU rename + susfs pairing, 271/272 stable, conntrack fix |
-| **0.3.3 (pre-release)** | `0.3.3` | **5.10.274** | **NoMount v2.0.0, Droidspaces/LXC, TEO upstream fixes, cpufreq-hw thermal pressure, RCU NOCB, DTBO support, LZ4 fixes** |
+| **0.3.3 (pre-release)** | `0.3.3` | **5.10.274** | **NoMount v2.0.0, Droidspaces/LXC, TEO upstream fixes, cpufreq-hw thermal pressure, RCU NOCB, DTBO support, LZ4 fixes** — manager `BakaSU v4.2.0-rc3_35257` (UAPI v6) |
