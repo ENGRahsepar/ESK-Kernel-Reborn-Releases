@@ -709,6 +709,13 @@ GitHub owner renamed `AKALIorg` → `ENGRahsepar` (Oct 2026; remotes/docs update
 - `ESK-Reborn-5.10.274-VNL-03889a9b047f-AnyKernel3.zip`
 - `module.tar.xz` — 608 modules (vendor_boot + vendor_dlkm)
 
+**Companion manager** — `BakaSU v4.2.0-rc3_35257` (officially signed, `com.resukisu.resukisu`)
+- Cert SHA-256 `d3469712b6214462764a1d8d3e5cbe1d6819a0b629791b9f4101867821f1df64` = `EXPECTED_HASH_BAKASU` — **the kernel accepts it**
+- KSU **UAPI v6** — same as this kernel (`ecda7c0e` has `KERNEL_SU_UAPI_VERSION = 6`)
+- version code 35257 = commit `516d3e87` (upstream `main`); our kernel is 35268 (`ecda7c0e`) — the kernel does **not** enforce manager/kernel version-code equality, only the cert hash
+- Variants published: universal, arm64-v8a, armeabi-v7a, x86_64, riscv64
+- **Gotcha:** a CI-built manager from the fork is signed with a *debug* key (the fork has no `KEYSTORE` / `PROD_KEYSTORE` Actions secret) → the kernel **rejects** it. Only officially-signed APKs work. The `repack-manager` job fails outright without `PROD_KEYSTORE`.
+
 **Builder fixes**
 - `~/esk_builder/ci/package.sh` — zstd packaging aborted when `Image.zst` already existed (zstd prompts to overwrite, fails with stdin closed). Fixed: `rm -f Image.zst` + `zstd -f`.
 - `~/esk_builder/build/setup.sh` — the LXC patch step is now idempotent: detects an already-applied patch (the LXC kABI changes are committed in-tree) and skips it instead of failing the build; also ensures the LXC configs land in the merged defconfig.
