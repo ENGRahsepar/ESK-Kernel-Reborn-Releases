@@ -19,11 +19,11 @@ without any prior session knowledge.
   ROM support target: Android 16/17 custom ROMs (A17 boot verified Sep 2026 on
    `Angxddeep/android_kernel_xiaomi_mt6895:seventeen` @ 5.10.264 — our 5.10.270
    is a strict superset; binderfs/ashmem present, LXC USER_NS via builder).
-- **Current stable sublevel:** **5.10.272** (tracked; check kernel.org for newer).
+- **Current stable sublevel:** **5.10.274** (tracked; check kernel.org for newer).
 - **Localversion convention:** `CONFIG_LOCALVERSION="-ESK-Reborn_V0.X"` in
-  `arch/arm64/configs/vendor/xaga.config` — **bump per release** (V0.3.2 on both
-  branches since Oct 2026 (was V0.3); the `17.0` V17.0 bump was reverted in `0edb2f37`).
-  `uname -r` shows `5.10.272-android12-...-ESK-Reborn_V0.3.2/<git-sha12>`.
+  `arch/arm64/configs/vendor/xaga.config` — **bump per release** (V0.3.3 on both
+  branches since Nov 2026 (was V0.3.2); the `17.0` V17.0 bump was reverted in `0edb2f37`).
+  `uname -r` shows `5.10.274-android12-...-ESK-Reborn_V0.3.3/<git-sha12>`.
 
 ---
 
@@ -460,6 +460,7 @@ Commit message format (Android Common Kernel rules):
 | 0.3 Beta 1 | 0.3 (renamed) | 5.10.268→269 era | **WITHDRAWN** — freezes (ESK deadlocks, later binder+le9uo) |
 | 0.3 | 0.3 | `e4428edd3ad6` | 5.10.270, all crash fixes, ESK v2.2 opt-in, bypass charging; KSU-SUSFS-LXC + modules live, VNL/KSU-SUSFS pending |
 | 0.3.1 | 0.3.1 | 5.10.271 (conntrack 271 fix era) | Localversion bump V0.3 → V0.3.1 on both branches; 5.10.272 merge prepared |
+| **0.3.3 (current, pre-release)** | 0.3.3 | 5.10.274 (`1eafbcae` merge, `03889a9b` release tree) | **5.10.272 → 5.10.274** (521 upstream commits, 17 conflicts); **NoMount v1.1.1 → v2.0.0**; **Droidspaces/LXC** configs + kABI reserves 6/7/8; **TEO cpuidle** upstream fixes; cpufreq-hw thermal pressure accounting; RCU NOCB param + disable RCU boosting; DTBO build support; LZ4 fixes; localversion V0.3.2 → V0.3.3. BakaSU `main` = upstream `516d3e87`, `sync-susfs` = upstream main + upstream `sync-up` (`ecda7c0e`); SUSFS pinned `ca7093a` (v2.3.0). All 3 variants (KSU-SUSFS / KSU-SUSFS-LXC / VNL) built from `03889a9b047f` — 608 modules |
 | **0.3.2 (current)** | 0.3.2 | 5.10.272 (3c27474e merge) | Localversion bump V0.3.1 → V0.3.2; tree source (5.10.272) newer than 0.3's 5.10.270 release base |
 | 0.4 (planned) | — | — | Vorpal v2.2 port + ESK default + fps/battery tuning |
 | 0.3.1/0.4 (planned) | — | — | Vorpal v2.2 port + ESK default + fps/battery tuning |
@@ -612,7 +613,7 @@ fixes all known regressions but has less cumulative on-device hours than 0.2.
 
 ## 16. CURRENT PROJECT STATUS & ROADMAP (as of this document)
 
-**State: 0.3.2 (5.10.272, V0.3.2 localversion; PUSHED + verified Oct 2026 on both branches — tips: `git log --oneline origin/16.2-rebase -1` / `origin/17.0 -1`).** ESK v2.2,
+**State: 0.3.3 pre-release (5.10.274, V0.3.3 localversion; PUSHED + verified Nov 2026 on both branches — tips: `git log --oneline origin/16.2-rebase -1` / `origin/17.0 -1`).** ESK v2.2,
 - **Branch-divergence decision (Oct 2026, user-confirmed): `157418db` (PAN) + `15e0e52d` (mtk-mml) stay `17.0`-ONLY**, not mirrored to `16.2-rebase` (A17-flavored; `16.2-rebase` serves 16.x ROMs). Do NOT "fix" this divergence with a branch merge.
 - **Upstream watch: `ESK-Project/android_kernel_xiaomi_mt6895:main` (Oct 3 2026)** carries a scheduler modernization we do NOT have: BORE 6.8.0 + 6.12-era EEVDF (delayed dequeue, run-to-parity, slice protection, lag placement, O(1) fastpath) on a 5.10.269 base. It does NOT have our ESK governor / NoMount / BBRplus. Port = dedicated project (fair.c rewrite zone), not a merge.
 Templar stable fixes (EEVDF rescale, BORE weight, yield), le9uo/mali
@@ -669,3 +670,53 @@ GitHub owner renamed `AKALIorg` → `ENGRahsepar` (Oct 2026; remotes/docs update
 - Prefer downloading donor files raw over cloning donor repos (unless multi-file).
 - Keep local clones: kernel (always), releases repo (/tmp/opencode/esk-releases),
   susfs (/tmp/opencode/susfs — re-clone when needed, /tmp wiped on reboot).
+
+---
+
+## 0.3.3 Pre-Release (current) — 5.10.274
+
+**Release tag:** `0.3.3` · **Localversion:** `V0.3.3` · **Source commit:** `03889a9b047f` (`17.0`)
+
+### What changed since 0.3.2 (5.10.272)
+
+**Stable base**
+- `1eafbcae` — **Update to Linux 5.10.274**: 521 upstream commits, 500 files, 17 conflicts resolved.
+  - **5.10.273** — xen-blkback/netback I/O-statistics UAF fixes, signal shared-signal retarget fix in dying thread groups, keys keyring-restriction races + key type-removal protections, tracing 64-bit histogram + event-filter expression hardening, Bluetooth L2CAP channel/conn double-add guards, nf_tables set nelems bump, codel stale-state fix, keys keyring index independence from kernel addresses.
+  - **5.10.274** — follow-up stable set on top of 273.
+- Vendor divergences preserved through the merge:
+  - `fs/f2fs/` — pre-merge vendor version (pointer-based `gc_thread` + GC_MERGE `fggc_wq`; upstream 274 embedded the struct and dropped `fggc_wq`).
+  - `fs/nfsd/nfs4proc.c` — pre-merge vendor version (our nfsd lacks `nfsd_attrs_free` / `nfsd4_acl_to_attr`).
+  - `net/core/{sock,filter,net_namespace}.c` — `net_cookie` is plain `u64` in upstream 274 (was `atomic64_t`); dropped `atomic64_read`/`atomic64_set`.
+  - `kernel/time/tick-broadcast.c` — pre-merge GKI variant (our tree uses the `(dev, int cpu)` signature; upstream 274 dropped the `cpu` param).
+  - `arch/arm64/kernel/cpu_errata.c` — restored `ARM64_ERRATUM_2457168` block + added upstream `ARM64_WORKAROUND_BROKEN_AMU_CONSTCNT` block.
+  - `include/linux/fsnotify_backend.h` — upstream `FSNOTIFY_CONN_FLAG_HAS_IREF` / `FSNOTIFY_CONN_FLAG_DESTROYING`.
+- KABI reserves 1-4 (BORE) intact; **reserves 6/7/8 added** for the LXC IPC namespace work.
+
+**New features**
+- `b02bd1ca` — **NoMount v1.1.1 → v2.0.0** (maxsteeel/nomount@master `bf1847f98`): patchless dcache hijack, Bloom-filter child indexing, UID isolation with direct overlap checks, RCU-safe rule lookups, child-bucket reuse on deletion.
+- `b02bd1ca` — **Droidspaces/LXC container support**: all required GKI configs in the vendor fragment (namespaces, cgroups, netfilter/NAT, veth/bridge/macvlan, seccomp, devtmpfs, overlayfs, tmpfs xattr + POSIX ACL) + LXC kABI patches in-tree (`include/linux/sched.h` reserves 6/7/8, `sched/user.h`, `cgroup.c`).
+- ESK-Project 16.2-rebase sync — **TEO cpuidle** upstream fix set (tick-wakeup rework, intercept decay, simplified intercepts-based state lookup, refined wakeup-event classification, `s64`-consistent accounting, `this_cpu_ptr()`), TEO prioritized over other governors, **cpufreq-hw thermal pressure accounting** (MediaTek), RCU NOCB kernel param (`rcu_nocbs=0-7`) + disable RCU priority boosting, DTBO build support + xaga/plato cust DTSIs, LZ4 fixes.
+- `142da5f4` — localversion bump `V0.3.2` → `V0.3.3`.
+
+**Root solution**
+- BakaSU fork `main` re-synced to upstream `main` (`516d3e87`).
+- BakaSU fork `sync-susfs` rebuilt = upstream `main` + upstream `sync-up` (`dc8e01e0`) → `ecda7c0e` (latest official susfs selinux sync: `selinux_hide` mangling, `fake_state` export, priority-uid susfs fixes).
+- SUSFS stays pinned at the verified pairing `ca7093a` (v2.3.0, GKI android12-5.10).
+
+**Build artifacts** (all three from `03889a9b047f`, version string `5.10.274-ESK-Reborn_V0.3.3/03889a9b`)
+- `ESK-Reborn-5.10.274-KSU-SUSFS-03889a9b047f-AnyKernel3.zip`
+- `ESK-Reborn-5.10.274-KSU-SUSFS-LXC-03889a9b047f-AnyKernel3.zip`
+- `ESK-Reborn-5.10.274-VNL-03889a9b047f-AnyKernel3.zip`
+- `module.tar.xz` — 608 modules (vendor_boot + vendor_dlkm)
+
+**Builder fixes**
+- `~/esk_builder/ci/package.sh` — zstd packaging aborted when `Image.zst` already existed (zstd prompts to overwrite, fails with stdin closed). Fixed: `rm -f Image.zst` + `zstd -f`.
+- `~/esk_builder/build/setup.sh` — the LXC patch step is now idempotent: detects an already-applied patch (the LXC kABI changes are committed in-tree) and skips it instead of failing the build; also ensures the LXC configs land in the merged defconfig.
+- `uv` was missing on the build machine (required by the `build.sh` dependency check) — installed to `~/.local/bin`.
+
+**Open items**
+- **Untested on device** — camera, bypass charging, gaming and suspend behaviour still need on-device validation before 0.3.3 goes stable.
+- **MGLRU not included** — the upstream 5.10 MGLRU backport (ESK-Project `main`, ~70 commits) is a separate large port.
+- **ESK governor still opt-in** (default = schedutil) pending multi-day stability on 5.10.274.
+- SUSFS upstream `gki-android12-5.10-dev` (`cba6103c`) not yet re-paired — this release stays on the verified `ca7093a` pairing.
+- Vorpal/ESK **v2.3** (Templar Linux7-Staging: frame pacing, thermal ratchet, BORE latency exemption, TEO cpuidle default, timer_migration=0) not yet ported.
